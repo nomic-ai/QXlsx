@@ -14,6 +14,8 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
+using namespace Qt::Literals::StringLiterals;
+
 QT_BEGIN_NAMESPACE_XLSX
 
 /*
@@ -835,56 +837,50 @@ bool Styles::readFont(QXmlStreamReader &reader, Format &format)
         reader.readNextStartElement();
         if (reader.tokenType() == QXmlStreamReader::StartElement) {
             const auto &attributes = reader.attributes();
+            auto valAttr = attributes.value("val"_L1);
+            bool boolVal = valAttr != "false"_L1 && valAttr != "0"_L1;
             if (reader.name() == QLatin1String("name")) {
-                format.setFontName(attributes.value(QLatin1String("val")).toString());
+                format.setFontName(valAttr.toString());
             } else if (reader.name() == QLatin1String("charset")) {
-                format.setProperty(FormatPrivate::P_Font_Charset,
-                                   attributes.value(QLatin1String("val")).toInt());
+                format.setProperty(FormatPrivate::P_Font_Charset, valAttr.toInt());
             } else if (reader.name() == QLatin1String("family")) {
-                format.setProperty(FormatPrivate::P_Font_Family,
-                                   attributes.value(QLatin1String("val")).toInt());
+                format.setProperty(FormatPrivate::P_Font_Family, valAttr.toInt());
             } else if (reader.name() == QLatin1String("b")) {
-                format.setFontBold(true);
+                format.setFontBold(boolVal);
             } else if (reader.name() == QLatin1String("i")) {
-                format.setFontItalic(true);
+                format.setFontItalic(boolVal);
             } else if (reader.name() == QLatin1String("strike")) {
-                format.setFontStrikeOut(true);
+                format.setFontStrikeOut(boolVal);
             } else if (reader.name() == QLatin1String("outline")) {
-                format.setFontOutline(true);
+                format.setFontOutline(boolVal);
             } else if (reader.name() == QLatin1String("shadow")) {
-                format.setProperty(FormatPrivate::P_Font_Shadow, true);
+                format.setProperty(FormatPrivate::P_Font_Shadow, boolVal);
             } else if (reader.name() == QLatin1String("condense")) {
-                format.setProperty(FormatPrivate::P_Font_Condense,
-                                   attributes.value(QLatin1String("val")).toInt());
+                format.setProperty(FormatPrivate::P_Font_Condense, boolVal);
             } else if (reader.name() == QLatin1String("extend")) {
-                format.setProperty(FormatPrivate::P_Font_Extend,
-                                   attributes.value(QLatin1String("val")).toInt());
+                format.setProperty(FormatPrivate::P_Font_Extend, boolVal);
             } else if (reader.name() == QLatin1String("color")) {
                 XlsxColor color;
                 color.loadFromXml(reader);
                 format.setProperty(FormatPrivate::P_Font_Color, color);
             } else if (reader.name() == QLatin1String("sz")) {
-                const auto sz = attributes.value(QLatin1String("val")).toInt();
-                format.setFontSize(sz);
+                format.setFontSize(valAttr.toInt());
             } else if (reader.name() == QLatin1String("u")) {
-                QString value = attributes.value(QLatin1String("val")).toString();
-                if (value == QLatin1String("double"))
+                if (valAttr == QLatin1String("double"))
                     format.setFontUnderline(Format::FontUnderlineDouble);
-                else if (value == QLatin1String("doubleAccounting"))
+                else if (valAttr == QLatin1String("doubleAccounting"))
                     format.setFontUnderline(Format::FontUnderlineDoubleAccounting);
-                else if (value == QLatin1String("singleAccounting"))
+                else if (valAttr == QLatin1String("singleAccounting"))
                     format.setFontUnderline(Format::FontUnderlineSingleAccounting);
                 else
                     format.setFontUnderline(Format::FontUnderlineSingle);
             } else if (reader.name() == QLatin1String("vertAlign")) {
-                QString value = attributes.value(QLatin1String("val")).toString();
-                if (value == QLatin1String("superscript"))
+                if (valAttr == QLatin1String("superscript"))
                     format.setFontScript(Format::FontScriptSuper);
-                else if (value == QLatin1String("subscript"))
+                else if (valAttr == QLatin1String("subscript"))
                     format.setFontScript(Format::FontScriptSub);
             } else if (reader.name() == QLatin1String("scheme")) {
-                format.setProperty(FormatPrivate::P_Font_Scheme,
-                                   attributes.value(QLatin1String("val")).toString());
+                format.setProperty(FormatPrivate::P_Font_Scheme, valAttr.toString());
             }
         }
     }
